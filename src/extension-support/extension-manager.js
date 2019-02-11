@@ -7,16 +7,20 @@ const BlockType = require('./block-type');
 // These extensions are currently built into the VM repository but should not be loaded at startup.
 // TODO: move these out into a separate repository?
 // TODO: change extension spec so that library info, including extension ID, can be collected through static methods
-const Scratch3PenBlocks = require('../extensions/scratch3_pen');
-const Scratch3WeDo2Blocks = require('../extensions/scratch3_wedo2');
-const Scratch3MusicBlocks = require('../extensions/scratch3_music');
-const Scratch3MicroBitBlocks = require('../extensions/scratch3_microbit');
-const Scratch3Text2SpeechBlocks = require('../extensions/scratch3_text2speech');
-const Scratch3TranslateBlocks = require('../extensions/scratch3_translate');
-const Scratch3VideoSensingBlocks = require('../extensions/scratch3_video_sensing');
-const Scratch3Speech2TextBlocks = require('../extensions/scratch3_speech2text');
-const Scratch3Ev3Blocks = require('../extensions/scratch3_ev3');
-const Scratch3MakeyMakeyBlocks = require('../extensions/scratch3_makeymakey');
+const Scratch3PenBlocks            = require('../extensions/scratch3_pen');
+const Scratch3WeDo2Blocks          = require('../extensions/scratch3_wedo2');
+const Scratch3MusicBlocks          = require('../extensions/scratch3_music');
+const Scratch3MicroBitBlocks       = require('../extensions/scratch3_microbit');
+const Scratch3Text2SpeechBlocks    = require('../extensions/scratch3_text2speech');
+const Scratch3TranslateBlocks      = require('../extensions/scratch3_translate');
+const Scratch3VideoSensingBlocks   = require('../extensions/scratch3_video_sensing');
+const Scratch3Speech2TextBlocks    = require('../extensions/scratch3_speech2text');
+const Scratch3Ev3Blocks            = require('../extensions/scratch3_ev3');
+const Scratch3MakeyMakeyBlocks     = require('../extensions/scratch3_makeymakey');
+const Scratch3RuloBlocks           = require('../extensions/scratch3_rulo');
+const Scratch3TurtlebotBlocks      = require('../extensions/scratch3_turtlebot');
+const Scratch3IftttBlocks          = require('../extensions/scratch3_ifttt');
+const Scratch3TfVideoSensingBlocks = require('../extensions/scratch3_tf_video_sensing');
 // todo: only load this extension once we have a compatible way to load its
 // Vernier module dependency.
 // const Scratch3GdxForBlocks = require('../extensions/scratch3_gdx_for');
@@ -31,7 +35,11 @@ const builtinExtensions = {
     videoSensing: Scratch3VideoSensingBlocks,
     speech2text: Scratch3Speech2TextBlocks,
     ev3: Scratch3Ev3Blocks,
-    makeymakey: Scratch3MakeyMakeyBlocks
+    makeymakey: Scratch3MakeyMakeyBlocks,
+    rulo: Scratch3RuloBlocks,
+    turtlebot: Scratch3TurtlebotBlocks,
+    ifttt: Scratch3IftttBlocks,
+    tfVideoSensing: Scratch3TfVideoSensingBlocks
     // gdxfor: Scratch3GdxForBlocks
 };
 
