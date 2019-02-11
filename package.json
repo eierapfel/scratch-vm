@@ -29,6 +29,12 @@
     "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\""
   },
   "dependencies": {
+    "ping": "0.2.2",
+    "babel-polyfill": "6.26.0",
+    "@tensorflow/tfjs": "0.14.2",
+    "@tensorflow-models/posenet": "0.2.3",
+    "node-ifttt-maker": "1.0.2",
+    "roslib": "0.20.0",
     "@vernier/godirect": "1.4.1",
     "arraybuffer-loader": "^1.0.6",
     "atob": "2.1.2",
