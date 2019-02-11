@@ -18,10 +18,10 @@ class RuloClass {
         this.isLeftBumperHit  = false;
         this.isRightBumperHit = false;
 
-        this.ros_ = new ROSLIB.Ros({url:'ws://rulo.local:9090'});
-        this.ros_.on('connection', function(){console.log('Connected to rosbridge server.');});
-        this.ros_.on('error', function(error){console.log('Error connecting to rosbridge server: ', error);});
-        this.ros_.on('close', function(){console.log('Connection of rosbridge was closed.');});
+        //this.ros_ = new ROSLIB.Ros({url:'ws://rulo.local:9090'});
+        //this.ros_.on('connection', function(){console.log('Connected to rosbridge server.');});
+        //this.ros_.on('error', function(error){console.log('Error connecting to rosbridge server: ', error);});
+        //this.ros_.on('close', function(){console.log('Connection of rosbridge was closed.');});
 
         //Publisher and Subscliber
         this.publisher_  = new ROSLIB.Topic({ ros:this.ros_, name:'/scratch_ros', messageType:'std_msgs/String'});
