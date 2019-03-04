@@ -3,43 +3,65 @@ const BlockType     = require('../../extension-support/block-type');
 const Cast          = require('../../util/cast');
 const languageNames = require('scratch-translate-extension-languages');
 const formatMessage = require('format-message');
+const RosUtil       = require('./RosUtil');
 const ROSLIB        = require('roslib');
 
 const iconURI = 'data:image/svg+xml;base64,PHN2ZyBpZD0i44Os44Kk44Ok44O8XzEiIGRhdGEtbmFtZT0i44Os44Kk44Ok44O8IDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDYyLjg3IDU5LjE5Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UwZTBlMDt9LmNscy0ye2ZpbGw6IzJiMmIyYjt9LmNscy0ze2ZpbGw6I2Q4ZDZkNjt9LmNscy00e2ZpbGw6IzM2NDc3MDt9LmNscy01e2ZpbGw6IzIzMjMyMzt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnJ1bG88L3RpdGxlPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTQ4LjA1LDUyLjc1LDYxLjU5LDI5LjNBMTcuODcsMTcuODcsMCwwLDAsNDYuMTIsMi41SDE5QTE3Ljg3LDE3Ljg3LDAsMCwwLDMuNTYsMjkuM0wxNy4xMSw1Mi43NUExNy44NiwxNy44NiwwLDAsMCw0OC4wNSw1Mi43NVoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xLjE0IC0yLjUpIi8+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNNDQuNjEsNDQuMzNsOC4xNy0xNi41OUExMy4zNSwxMy4zNSwwLDAsMCw0MC44LDguNUgyNC40N2ExMy4zNSwxMy4zNSwwLDAsMC0xMiwxOS4yNGw4LjE3LDE2LjU5QTEzLjM1LDEzLjM1LDAsMCwwLDQ0LjYxLDQ0LjMzWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEuMTQgLTIuNSkiLz48cGF0aCBjbGFzcz0iY2xzLTMiIGQ9Ik00My4yOCw0Mi43NGw3LjIzLTE1LjU3QTExLjczLDExLjczLDAsMCwwLDM5Ljg2LDEwLjVIMjUuNDFBMTEuNzMsMTEuNzMsMCwwLDAsMTQuNzcsMjcuMTdMMjIsNDIuNzRBMTEuNzQsMTEuNzQsMCwwLDAsNDMuMjgsNDIuNzRaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMS4xNCAtMi41KSIvPjxyZWN0IGNsYXNzPSJjbHMtNCIgeD0iMjcuMTEiIHk9IjI5IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iNCIgcnk9IjQiLz48cmVjdCBjbGFzcz0iY2xzLTUiIHg9IjI2LjExIiB3aWR0aD0iMTEiIGhlaWdodD0iMiIvPjwvc3ZnPg==';
 
 
-class RuloClass {
+class Scratch3RuloBase {
 
-    constructor()
-    {
-        //define of variable
+    static get EXTENSION_NAME () {
+        return 'Rulo';
+    }
+
+    static get EXTENSION_ID () {
+        return 'rulo';
+    }
+
+    constructor (runtime) {
         this.isRuloMoving     = false;
         this.isButtonPush     = (new Array(6)).fill(false);
         this.isLeftBumperHit  = false;
         this.isRightBumperHit = false;
 
-        this.ros_ = new ROSLIB.Ros({url:'ws://rulo.local:9090'});
-        this.ros_.on('connection', function(){console.log('Connected to rosbridge server.');});
-        this.ros_.on('error', function(error){console.log('Error connecting to rosbridge server: ', error);});
-        this.ros_.on('close', function(){console.log('Connection of rosbridge was closed.');});
-
-        //Publisher and Subscliber
-        this.publisher_  = new ROSLIB.Topic({ ros:this.ros_, name:'/scratch_ros', messageType:'std_msgs/String'});
-        this.subscliber_ = new ROSLIB.Topic({ ros:this.ros_, name:'/ros_scratch', messageType:'std_msgs/String'});
-        this.subscliber_.subscribe(message => { this.analysisRosMessage(message);});
+        this.runtime     = runtime;
+        this.extensionId = Scratch3RuloBase.EXTENSION_ID;
+        this.runtime.registerPeripheralExtension(this.extensionId, this);
+        this.runtime.on('PROJECT_STOP_ALL', this.stopProgram.bind(this));
     }
 
-    setRosIp(ipAddress){
-        this.ros_ = new ROSLIB.Ros({url: 'ws://' + ipAddress + ':9090'});
-        this.ros_.on('connection', function(){console.log('Connected to rosbridge server.');});
-        this.ros_.on('error', function(error){console.log('Error connecting to rosbridge server: ', error);});
-        this.ros_.on('close', function(){console.log('Connection of rosbridge was closed.');});
+    scan () {
+        // Not going to really 'scan' anything
+        // When running from github.io, only connections to localhost can be safely established
+        // Otherwise we need to use WebSocketSecure or host our own http site
+        this.connect('ws://localhost:9090');
+    }
 
-        //Publisher and Subscliber
-        this.publisher_  = new ROSLIB.Topic({ ros:this.ros_, name:'/scratch_ros', messageType:'std_msgs/String'});
-        this.subscliber_ = new ROSLIB.Topic({ ros:this.ros_, name:'/ros_scratch', messageType:'std_msgs/String'});
-        this.subscliber_.subscribe(message => { this.analysisRosMessage(message);});
-        console.log('Rulo setRosIp : ' + ipAddress);
+    connect (url) {
+        this.ros = new RosUtil(this.runtime, this.extensionId, {url: url});
+        this.publisher  = new ROSLIB.Topic({ ros:this.ros, name:'/scratch_ros', messageType:'std_msgs/String'});
+        this.subscliber = new ROSLIB.Topic({ ros:this.ros, name:'/ros_scratch', messageType:'std_msgs/String'});
+        this.subscliber.subscribe(message => { this.analysisRosMessage(message);});
+        this.publishScratchRos("initialize ok");
+        console.log('Rulo connect : ' + url);
+    }
+
+    disconnect () {
+        this.ros.socket.close();
+    }
+
+    isConnected () {
+        if (this.ros) return this.ros.isConnected;
+        return false;
+    }
+
+    stopProgram(){
+        this.publishScratchRos("rulo_cmd_vel:0,0");
+        this.publishScratchRos("rulo_clean:0,0");
+        this.publishScratchRos("scratch_stoped");
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 50);});
+        this.isRuloMoving = false;
     }
 
     analysisRosMessage(message){
@@ -70,78 +92,36 @@ class RuloClass {
 
     publishScratchRos(message){
         const rosMsg = new ROSLIB.Message({ data : message});
-        this.publisher_.publish(rosMsg);
+        this.publisher.publish(rosMsg);
     }
 
-}//RuloClass
-
-
-class Scratch3RuloBlocks {
-
-    constructor (runtime) {
-        this.extensionId = "rulo";
-        console.log(this.extensionId);
-        this.runtime_ = runtime;
-        this.runtime_.registerPeripheralExtension(this.extensionId, this);
-        this.runtime_.on('PROJECT_STOP_ALL', this.stopProgram.bind(this));
-        this.rulo_ = new RuloClass();
+    setRosIpWs(args){
+        this.connect ('ws://' + args.ROS_IP + ':9090');
     }
 
-    static get STATE_KEY () { return 'scratch.rulo'; }
-
-    stopProgram(){
-        this.rulo_.publishScratchRos("rulo_cmd_vel:0,0");
-        this.rulo_.publishScratchRos("rulo_clean:0,0");
-        this.rulo_.publishScratchRos("scratch_stoped");
-        this.rulo_.isRuloMoving = false;
-    }
-
-    setROSIP(args){ this.rulo_.setRosIp(String(args.ROS_IP)); }
-
-    scan () {
-        console.log('scan');
-        // Not going to really 'scan' anything
-        // When running from github.io, only connections to localhost can be safely established
-        // Otherwise we need to use WebSocketSecure or host our own http site
-        //this.connect('ws://localhost:9090');
-        this.rulo_.setRosIp(String("192.168.0.17"));
-    }
-
-    connect (url) {
-        console.log('connect');
-        //this.ros = new RosUtil(this.runtime, this.extensionId, {url: url});
-    }
-
-    disconnect () {
-        console.log('disconnect');
-        //this.ros.socket.close();
-    }
-
-    isConnected () {
-        //console.log('isConnected() called');
-        console.log(this.rulo_.ros_.isConnected);
-        return this.rulo_.ros_.isConnected;
-        //return true;
+    setRosIpWss(args){
+        this.connect ('wss://' + args.ROS_IP + ':9090');
     }
 
     setRuloMode(args){
-        if(String(args.RULO_MODE) == "マニュアルモード"){    this.rulo_.publishScratchRos("rulo_drive_mode:manual"); }
-        else if(String(args.RULO_MODE) == "ノーマルモード"){ this.rulo_.publishScratchRos("rulo_drive_mode:normal"); }
+        if(String(args.RULO_MODE) == "マニュアルモード"){    this.publishScratchRos("rulo_drive_mode:manual"); }
+        else if(String(args.RULO_MODE) == "ノーマルモード"){ this.publishScratchRos("rulo_drive_mode:normal"); }
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 50);});
     }
 
     pushButtonEvent(args){
-        if(String(args.RULO_BUTTON) == "スタート＆ストップ" && this.rulo_.isButtonPush[0] == true){ return true; }
-        else if(String(args.RULO_BUTTON) == "ホーム"    && this.rulo_.isButtonPush[1] == true){ return true; }
-        else if(String(args.RULO_BUTTON) == "念入り"    && this.rulo_.isButtonPush[2] == true){ return true; }
-        else if(String(args.RULO_BUTTON) == "スポット"   && this.rulo_.isButtonPush[3] == true){ return true; }
-        else if(String(args.RULO_BUTTON) == "予約"     && this.rulo_.isButtonPush[4] == true){ return true; }
-        else if(String(args.RULO_BUTTON) == "毎日"     && this.rulo_.isButtonPush[5] == true){ return true; }
+        if(String(args.RULO_BUTTON) == "スタート＆ストップ" && this.isButtonPush[0] == true){ return true; }
+        else if(String(args.RULO_BUTTON) == "ホーム"    && this.isButtonPush[1] == true){ return true; }
+        else if(String(args.RULO_BUTTON) == "念入り"    && this.isButtonPush[2] == true){ return true; }
+        else if(String(args.RULO_BUTTON) == "スポット"   && this.isButtonPush[3] == true){ return true; }
+        else if(String(args.RULO_BUTTON) == "予約"     && this.isButtonPush[4] == true){ return true; }
+        else if(String(args.RULO_BUTTON) == "毎日"     && this.isButtonPush[5] == true){ return true; }
         else{ return false; }
     }
 
     pushBumperEvent(args){
-        if( String(args.RULO_BUMPER)     == "右" && this.rulo_.isRightBumperHit){ return true; }
-        else if(String(args.RULO_BUMPER) == "左" && this.rulo_.isLeftBumperHit){  return true; }
+        if( String(args.RULO_BUMPER)     == "右" && this.isRightBumperHit){ return true; }
+        else if(String(args.RULO_BUMPER) == "左" && this.isLeftBumperHit){  return true; }
         else{ return false; }
     }
 
@@ -154,21 +134,23 @@ class Scratch3RuloBlocks {
         if(targetRad < -90){ targetRad = -90; }
         if(targetRad >  90){ targetRad =  90; }
 
-        this.rulo_.publishScratchRos("rulo_cmd_vel:" + String(targetVel) + ',' + String(targetRad));
-        return new Promise(resolve => {setTimeout(() => {resolve();}, 100);});
-        if(targetVel == 0 && targetRad == 0){ this.rulo_.isRuloMoving = false; }
-        else{ this.rulo_.isRuloMoving = true; }
+        this.publishScratchRos("rulo_cmd_vel:" + String(targetVel) + ',' + String(targetRad));
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 50);});
+
+        if(targetVel == 0 && targetRad == 0){ this.isRuloMoving = false; }
+        else{ this.isRuloMoving = true; }
     }
 
     pubStopVel(args){
-        this.rulo_.publishScratchRos("rulo_cmd_vel:0,0");
-        this.rulo_.publishScratchRos("scratch_stoped");
-        this.rulo_.isRuloMoving = false;
+        this.publishScratchRos("rulo_cmd_vel:0,0");
+        this.publishScratchRos("scratch_stoped");
+        this.isRuloMoving = false;
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 50);});
     }
 
     pubOdomBaseStraight(args){
-        this.rulo_.publishScratchRos("rulo_straight:" + String(args.WORDS));
-        this.rulo_.isRuloMoving = true;
+        this.publishScratchRos("rulo_straight:" + String(args.WORDS));
+        this.isRuloMoving = true;
 
         var targetDistance = Number(args.WORDS);
         if(targetDistance < 0){ targetDistance *=  -1; }
@@ -179,8 +161,8 @@ class Scratch3RuloBlocks {
     }
 
     pubOdomBaseTurn(args){
-        this.rulo_.publishScratchRos("rulo_turn:" + String(args.WORDS));
-        this.rulo_.isRuloMoving = true;
+        this.publishScratchRos("rulo_turn:" + String(args.WORDS));
+        this.isRuloMoving = true;
 
         var targetAngle = Number(args.WORDS);
         if(targetAngle < 0){ targetAngle *=  -1; }
@@ -194,119 +176,137 @@ class Scratch3RuloBlocks {
         var targetPower = Number(args.Vacuum_VALUE);
         if(targetPower < 0){   targetPower *= -1; }
         if(targetPower > 100){ targetPower  = 100;}
-        this.rulo_.publishScratchRos("rulo_clean:"+String(targetPower)+','+String(targetPower));
+        this.publishScratchRos("rulo_clean:"+String(targetPower)+','+String(targetPower));
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 50);});
     }
 
-    pubStopCrean(args){ this.rulo_.publishScratchRos("rulo_clean:0,0");}
+    pubStopCrean(args){
+        this.publishScratchRos("rulo_clean:0,0");
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 50);});
+    }
 
-    pubSpeech(args){ this.rulo_.publishScratchRos("speech:" + String(args.WORDS));}
+    pubSpeech(args){
+        this.publishScratchRos("speech:" + String(args.WORDS));
+        return new Promise(resolve => {setTimeout(() => {resolve();}, 1000);});
+    }
 
     boolButton(args){
-        console.log(this.rulo_.isButtonPush[0]);
-        if(String(args.RULO_BUTTON) == "スタート＆ストップ"){ return this.rulo_.isButtonPush[0]; }
-        else if(String(args.RULO_BUTTON) == "ホーム"){    return this.rulo_.isButtonPush[1]; }
-        else if(String(args.RULO_BUTTON) == "念入り"){    return this.rulo_.isButtonPush[2]; }
-        else if(String(args.RULO_BUTTON) == "スポット"){   return this.rulo_.isButtonPush[3]; }
-        else if(String(args.RULO_BUTTON) == "予約"){     return this.rulo_.isButtonPush[4]; }
-        else if(String(args.RULO_BUTTON) == "毎日"){     return this.rulo_.isButtonPush[5]; }
-    }//boolButton
+        console.log(this.isButtonPush[0]);
+        if(String(args.RULO_BUTTON) == "スタート＆ストップ"){ return this.isButtonPush[0]; }
+        else if(String(args.RULO_BUTTON) == "ホーム"){    return this.isButtonPush[1]; }
+        else if(String(args.RULO_BUTTON) == "念入り"){    return this.isButtonPush[2]; }
+        else if(String(args.RULO_BUTTON) == "スポット"){   return this.isButtonPush[3]; }
+        else if(String(args.RULO_BUTTON) == "予約"){     return this.isButtonPush[4]; }
+        else if(String(args.RULO_BUTTON) == "毎日"){     return this.isButtonPush[5]; }
+    }
 
     boolBumper(args){
-        if(String(args.RULO_BUMPER) == "右"){ return this.rulo_.isRightBumperHit; }
-        if(String(args.RULO_BUMPER) == "左"){ return this.rulo_.isLeftBumperHit;  }
+        if(String(args.RULO_BUMPER) == "右"){ return this.isRightBumperHit; }
+        if(String(args.RULO_BUMPER) == "左"){ return this.isLeftBumperHit;  }
     }
+
+}//RuloClass
+
+
+class Scratch3RuloBlocks extends Scratch3RuloBase {
 
     getInfo () {
         return {
-            id: 'rulo',
-            name: formatMessage({
-                id: 'rulo.categoryName',
-                default: 'Rulo'
-            }),
+            id: Scratch3RuloBase.EXTENSION_ID,
+            name: Scratch3RuloBase.EXTENSION_NAME,
+            colour: '#58ACFA',
+            colourSecondary: '#2E9AFE',
+            colourTertiary: '#0080FF',
             showStatusButton: true,
             menuIconURI: iconURI,
             blockIconURI: iconURI,
             blocks: [
                 {
-                    opcode: 'setROSIP',
-                    text: formatMessage({id: 'rulo.setROSIP', default: '[ROS_IP]のRuloに接続する'}),
+                    opcode: 'setRosIpWs',
+                    text: '[ROS_IP]のRuloに接続する(ws)',
                     blockType: BlockType.COMMAND,
-                    arguments: { ROS_IP:{type:ArgumentType.STRING, defaultValue:formatMessage({id:'rulo.setROSIP_Number',default:'192.168.0.1'})}}
+                    arguments: { ROS_IP:{type:ArgumentType.STRING, defaultValue:'192.168.0.1'}}
+                },
+                {
+                    opcode: 'setRosIpWss',
+                    text: '[ROS_IP]のRuloに接続する(wss)',
+                    blockType: BlockType.COMMAND,
+                    arguments: { ROS_IP:{type:ArgumentType.STRING, defaultValue:'192.168.0.1'}}
                 },
                 {
                     opcode: 'setRuloMode',
-                    text: formatMessage({id: 'rulo.setRuloMode', default: '動作モードを [RULO_MODE] にする'}),
+                    text: '動作モードを [RULO_MODE] にする',
                     blockType: BlockType.COMMAND,
                     arguments: { RULO_MODE:{type:ArgumentType.STRING, menu:'RULO_MODE', defaultValue:"マニュアルモード"}}
                 },
                 {
                     opcode: 'pushButtonEvent',
-                    text: formatMessage({id: 'rulo.pushButtonEvent', default: '[RULO_BUTTON] ボタンが押された時'}),
+                    text: '[RULO_BUTTON] ボタンが押された時',
                     blockType: BlockType.HAT,
                     arguments: { RULO_BUTTON:{type:ArgumentType.STRING, menu:'RULO_BUTTON', defaultValue:"スタート＆ストップ"}}
                 },
                 {
                     opcode: 'pushBumperEvent',
-                    text: formatMessage({id: 'rulo.pushBumperEvent', default: '[RULO_BUMPER] バンパが押された時'}),
+                    text: '[RULO_BUMPER] バンパが押された時',
                     blockType: BlockType.HAT,
                     arguments: { RULO_BUMPER:{type:ArgumentType.STRING, menu:'RULO_BUMPER', defaultValue:"右"}}
                 },
                 {
                     opcode: 'pubCmdVel',
-                    text: formatMessage({id:'rulo.pubCmdVel',　default:'前後 [VEL_VALUE]cm/秒 左右[RAD_VALUE]度/秒 で移動する'}),
+                    text: '前後 [VEL_VALUE]cm/秒 左右[RAD_VALUE]度/秒 で移動する',
                     blockType: BlockType.COMMAND,
                     arguments: {
-                        VEL_VALUE:{type:ArgumentType.ANGLE, defaultValue:formatMessage({id:'rulo.pubCmdVel_Vel', default:'30'})},
-                        RAD_VALUE:{type:ArgumentType.ANGLE, defaultValue:formatMessage({id:'rulo.pubCmdVel_Rad', default: '0'})}
+                        VEL_VALUE:{type:ArgumentType.ANGLE, defaultValue:'30'},
+                        RAD_VALUE:{type:ArgumentType.ANGLE, defaultValue:'0'}
                     }
                 },
                 {
                     opcode: 'pubOdomBaseStraight',
-                    text: formatMessage({id: 'rulo.pubOdomBaseStraight', default: '[WORDS]cm 直進する'}),
+                    text: '[WORDS]cm 直進する',
                     blockType: BlockType.COMMAND,
-                    arguments: {WORDS:{type:ArgumentType.ANGLE, defaultValue:formatMessage({id:'rulo.pubOdomBaseStraight_Number', default:'100'})}}
+                    arguments: {WORDS:{type:ArgumentType.ANGLE, defaultValue: '100'}}
                 },
                 {
                     opcode: 'pubOdomBaseTurn',
-                    text: formatMessage({id: 'rulo.pubOdomBaseTurn', default: '[WORDS]度回転する'}),
+                    text: '[WORDS]度回転する',
                     blockType: BlockType.COMMAND,
-                    arguments: {WORDS:{type:ArgumentType.ANGLE, defaultValue:formatMessage({id:'rulo.pubOdomBaseTurn_Number',　default:'90'})}}
+                    arguments: {WORDS:{type:ArgumentType.ANGLE, defaultValue:'90'}}
                 },
                 {
                     opcode: 'pubStopVel',
-                    text: formatMessage({id: 'rulo.pubStopVel',　default: '移動を停止する'}),
+                    text: '移動を停止する',
                     blockType: BlockType.COMMAND,
                     arguments: {}
                 },
                 {
                     opcode: 'pubClean',
-                    text: formatMessage({id: 'rulo.pubClean',　default: '[Vacuum_VALUE]% の強さで掃除する'}),
+                    text: '[Vacuum_VALUE]% の強さで掃除する',
                     blockType: BlockType.COMMAND,
                     arguments: {
-                        Vacuum_VALUE: {type:ArgumentType.ANGLE, defaultValue:formatMessage({id:'rulo.pubClean_Vacuum', default:'50'})}
+                        Vacuum_VALUE: {type:ArgumentType.ANGLE, defaultValue:'50'}
                     }
                 },
                 {
                     opcode: 'pubStopCrean',
-                    text: formatMessage({id: 'rulo.pubStopCrean',　default: '掃除を停止する'}),
+                    text: '掃除を停止する',
                     blockType: BlockType.COMMAND,
                     arguments: {}
                 },
                 {
                     opcode: 'pubSpeech',
-                    text: formatMessage({id: 'rulo.pubSpeech', default: '[WORDS] と話す'}),
+                    text: '[WORDS] と話す',
                     blockType: BlockType.COMMAND,
-                    arguments: {WORDS:{type:ArgumentType.STRING, defaultValue:formatMessage({id:'rulo.pubSpeech_Word',　default:'こんにちは'})}}
+                    arguments: {WORDS:{type:ArgumentType.STRING, defaultValue: 'こんにちは'}}
                 },
                 {
                     opcode: 'boolButton',
-                    text: formatMessage({id: 'rulo.boolButton',　default: '[RULO_BUTTON] ボタンが押されているか？'}),
+                    text: '[RULO_BUTTON] ボタンが押されているか？',
                     blockType: BlockType.BOOLEAN,
                     arguments: {RULO_BUTTON: {type: ArgumentType.STRING, menu: 'RULO_BUTTON', defaultValue: "スタート＆ストップ"}}
                 },
                 {
                     opcode: 'boolBumper',
-                    text: formatMessage({id: 'rulo.boolBumper',　default: '[RULO_BUMPER] バンパが押されているか？'}),
+                    text: '[RULO_BUMPER] バンパが押されているか？',
                     blockType: BlockType.BOOLEAN,
                     arguments: {RULO_BUMPER:{type:ArgumentType.STRING, menu:'RULO_BUMPER', defaultValue:"右"}}
                 }
