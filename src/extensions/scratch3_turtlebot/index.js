@@ -103,7 +103,7 @@ class Scratch3TurtleBotBlocks {
     stopProgram (){ this.turtlebot_.publishScratchRos("motion_stop:True"); }
 
     setROSIP (args) {
-        if(String(args.TURTLEBOT_NAME) == "TurtleBot_1"){       this.turtlebot_.setRosIp('192.168.11.11');  }
+        if(String(args.TURTLEBOT_NAME) == "TurtleBot_1"){       this.turtlebot_.setRosIp('192.168.1.10');  }
         else if(String(args.TURTLEBOT_NAME) == "TurtleBot_2"){  this.turtlebot_.setRosIp('192.168.1.20');  }
         else if(String(args.TURTLEBOT_NAME) == "TurtleBot_3"){  this.turtlebot_.setRosIp('192.168.1.30');  }
         else if(String(args.TURTLEBOT_NAME) == "TurtleBot_4"){  this.turtlebot_.setRosIp('192.168.1.40');  }
@@ -116,7 +116,7 @@ class Scratch3TurtleBotBlocks {
     }
 
     closeROSIP(args){
-      if(String(args.TURTLEBOT_NAME) == "TurtleBot_1"){       this.turtlebot_.closeRosIp('192.168.11.11');  }
+      if(String(args.TURTLEBOT_NAME) == "TurtleBot_1"){       this.turtlebot_.closeRosIp('192.168.1.10');  }
       else if(String(args.TURTLEBOT_NAME) == "TurtleBot_2"){  this.turtlebot_.closeRosIp('192.168.1.20');  }
       else if(String(args.TURTLEBOT_NAME) == "TurtleBot_3"){  this.turtlebot_.closeRosIp('192.168.1.30');  }
       else if(String(args.TURTLEBOT_NAME) == "TurtleBot_4"){  this.turtlebot_.closeRosIp('192.168.1.40');  }
