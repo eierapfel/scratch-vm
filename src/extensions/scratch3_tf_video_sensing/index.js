@@ -158,7 +158,7 @@ class Scratch3TfVideoSensingBlocks {
 
         this.runtime = runtime;
         this.detect = new VideoMotion();
-
+        console.log("tf_video_sensing");
         loadPoseNet();
 
         this._lastUpdate = null;

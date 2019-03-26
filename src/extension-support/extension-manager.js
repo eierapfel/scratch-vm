@@ -21,6 +21,8 @@ const Scratch3RuloBlocks           = require('../extensions/scratch3_rulo');
 const Scratch3TurtlebotBlocks      = require('../extensions/scratch3_turtlebot');
 const Scratch3IftttBlocks          = require('../extensions/scratch3_ifttt');
 const Scratch3TfVideoSensingBlocks = require('../extensions/scratch3_tf_video_sensing');
+const Scratch3NewBlocks            = require('../extensions/scratch3_newblocks');
+// newblocks: () => require('../extensions/scratch3_newblocks')
 // todo: only load this extension once we have a compatible way to load its
 // Vernier module dependency.
 // const Scratch3GdxForBlocks = require('../extensions/scratch3_gdx_for');
@@ -39,7 +41,9 @@ const builtinExtensions = {
     rulo: Scratch3RuloBlocks,
     turtlebot: Scratch3TurtlebotBlocks,
     ifttt: Scratch3IftttBlocks,
-    tfVideoSensing: Scratch3TfVideoSensingBlocks
+    tfVideoSensing: Scratch3TfVideoSensingBlocks,
+    newblocks: Scratch3NewBlocks
+    //newblocks: () => require('../extensions/scratch3_newblocks')
     // gdxfor: Scratch3GdxForBlocks
 };
 

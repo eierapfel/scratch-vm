@@ -77,7 +77,7 @@ class Scratch3VideoSensingBlocks {
          * @type {Runtime}
          */
         this.runtime = runtime;
-
+        console.log("vido_sensing");
         /**
          * The motion detection algoritm used to power the motion amount and
          * direction values.
