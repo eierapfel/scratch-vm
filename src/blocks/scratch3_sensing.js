@@ -43,7 +43,8 @@ class Scratch3SensingBlocks {
         this.runtime.on('ANSWER', this._onAnswer.bind(this));
         this.runtime.on('PROJECT_START', this._resetAnswer.bind(this));
         this.runtime.on('PROJECT_STOP_ALL', this._clearAllQuestions.bind(this));
-        this.runtime.on('STOP_FOR_TARGET', this._clearTargetQuestions.bind(this));
+		this.runtime.on('STOP_FOR_TARGET', this._clearTargetQuestions.bind(this));
+		console.log("scratch3_sensing.js");
     }
 
     /**
@@ -216,15 +217,17 @@ class Scratch3SensingBlocks {
         util.ioQuery('clock', 'resetProjectTimer');
     }
 
-    getMouseX (args, util) {
+	getMouseX(args, util) {
         return util.ioQuery('mouse', 'getScratchX');
     }
 
     getMouseY (args, util) {
+		console.log("gerMouseY");
         return util.ioQuery('mouse', 'getScratchY');
     }
 
     getMouseDown (args, util) {
+		console.log("getMouseDown");
         return util.ioQuery('mouse', 'getIsDown');
     }
 
@@ -276,7 +279,8 @@ class Scratch3SensingBlocks {
         return this.getLoudness() > 10;
     }
 
-    getAttributeOf (args) {
+	getAttributeOf(args) {
+		console.log("getAttributeOf");
         let attrTarget;
 
         if (args.OBJECT === '_stage_') {

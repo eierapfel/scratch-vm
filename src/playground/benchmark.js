@@ -509,6 +509,7 @@ const runBenchmark = function () {
         e.preventDefault();
     });
     canvas.addEventListener('mouseup', e => {
+		console.log("canvas.addEventListener");
         const rect = canvas.getBoundingClientRect();
         const data = {
             isDown: false,

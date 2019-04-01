@@ -1,21 +1,24 @@
 const Cast = require('../util/cast');
 const MathUtil = require('../util/math-util');
 const Timer = require('../util/timer');
-
+console.log("scratch3_motion.js");
 class Scratch3MotionBlocks {
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
          * @type {Runtime}
          */
-        this.runtime = runtime;
+		this.runtime = runtime;
+		console.log("constructor");
+		console.log(Scratch3MotionBlocks.caller);
     }
 
     /**
      * Retrieve the block primitives implemented by this package.
      * @return {object.<string, Function>} Mapping of opcode to Function.
      */
-    getPrimitives () {
+	getPrimitives() {
+		console.log("getPrimitives");
         return {
             motion_movesteps: this.moveSteps,
             motion_gotoxy: this.goToXY,
@@ -44,7 +47,8 @@ class Scratch3MotionBlocks {
         };
     }
 
-    getMonitored () {
+	getMonitored() {
+		console.log("getMonitored");
         return {
             motion_xposition: {
                 isSpriteSpecific: true,
@@ -61,7 +65,8 @@ class Scratch3MotionBlocks {
         };
     }
 
-    moveSteps (args, util) {
+	moveSteps(args, util) {
+		console.log("moveSteps");
         const steps = Cast.toNumber(args.STEPS);
         const radians = MathUtil.degToRad(90 - util.target.direction);
         const dx = steps * Math.cos(radians);
@@ -69,13 +74,15 @@ class Scratch3MotionBlocks {
         util.target.setXY(util.target.x + dx, util.target.y + dy);
     }
 
-    goToXY (args, util) {
+	goToXY(args, util) {
+		console.log("goToXY");
         const x = Cast.toNumber(args.X);
         const y = Cast.toNumber(args.Y);
         util.target.setXY(x, y);
     }
 
-    getTargetXY (targetName, util) {
+	getTargetXY(targetName, util) {
+		console.log("getTargetXY");
         let targetX = 0;
         let targetY = 0;
         if (targetName === '_mouse_') {
@@ -95,29 +102,37 @@ class Scratch3MotionBlocks {
         return [targetX, targetY];
     }
 
-    goTo (args, util) {
+	goTo(args, util) {
+		console.log("goTo");
         const targetXY = this.getTargetXY(args.TO, util);
         if (targetXY) {
             util.target.setXY(targetXY[0], targetXY[1]);
         }
     }
 
-    turnRight (args, util) {
+	turnRight(args, util) {
+		console.log("turnRight");
         const degrees = Cast.toNumber(args.DEGREES);
         util.target.setDirection(util.target.direction + degrees);
     }
 
-    turnLeft (args, util) {
+	turnLeft(args, util) {
+		console.log("turnLeft");
         const degrees = Cast.toNumber(args.DEGREES);
         util.target.setDirection(util.target.direction - degrees);
     }
 
-    pointInDirection (args, util) {
-        const direction = Cast.toNumber(args.DIRECTION);
+	pointInDirection(args, util) {
+		console.log("point_direction");
+		console.log(this.pointInDirection.caller);
+		console.log(util);
+		const direction = Cast.toNumber(args.DIRECTION);
+		console.log(direction);
         util.target.setDirection(direction);
     }
 
-    pointTowards (args, util) {
+	pointTowards(args, util) {
+		console.log("pointTowards");
         let targetX = 0;
         let targetY = 0;
         if (args.TOWARDS === '_mouse_') {
@@ -139,7 +154,8 @@ class Scratch3MotionBlocks {
         util.target.setDirection(direction);
     }
 
-    glide (args, util) {
+	glide(args, util) {
+		console.log("glide");
         if (util.stackFrame.timer) {
             const timeElapsed = util.stackFrame.timer.timeElapsed();
             if (timeElapsed < util.stackFrame.duration * 1000) {
@@ -174,14 +190,16 @@ class Scratch3MotionBlocks {
         }
     }
 
-    glideTo (args, util) {
+	glideTo(args, util) {
+		console.log("glideTo");
         const targetXY = this.getTargetXY(args.TO, util);
         if (targetXY) {
             this.glide({SECS: args.SECS, X: targetXY[0], Y: targetXY[1]}, util);
         }
     }
 
-    ifOnEdgeBounce (args, util) {
+	ifOnEdgeBounce(args, util) {
+		console.log("ifOnEdgeBounce");
         const bounds = util.target.getBounds();
         if (!bounds) {
             return;
@@ -237,44 +255,53 @@ class Scratch3MotionBlocks {
         util.target.setXY(fencedPosition[0], fencedPosition[1]);
     }
 
-    setRotationStyle (args, util) {
+	setRotationStyle(args, util) {
+		console.log("setRotationStyle");
         util.target.setRotationStyle(args.STYLE);
     }
 
-    changeX (args, util) {
+	changeX(args, util) {
+		console.log("changeX");
         const dx = Cast.toNumber(args.DX);
         util.target.setXY(util.target.x + dx, util.target.y);
     }
 
-    setX (args, util) {
+	setX(args, util) {
+		console.log("setX");
         const x = Cast.toNumber(args.X);
         util.target.setXY(x, util.target.y);
     }
 
-    changeY (args, util) {
+	changeY(args, util) {
+		console.log("changeY");
         const dy = Cast.toNumber(args.DY);
         util.target.setXY(util.target.x, util.target.y + dy);
     }
 
-    setY (args, util) {
+	setY(args, util) {
+		console.log("setY");
         const y = Cast.toNumber(args.Y);
         util.target.setXY(util.target.x, y);
     }
 
-    getX (args, util) {
+	getX(args, util) {
+		console.log("getX");
         return this.limitPrecision(util.target.x);
     }
 
-    getY (args, util) {
+	getY(args, util) {
+		console.log("getY");
         return this.limitPrecision(util.target.y);
     }
 
-    getDirection (args, util) {
+	getDirection(args, util) {
+		console.log("getDirection");
         return util.target.direction;
     }
 
     // This corresponds to snapToInteger in Scratch 2
-    limitPrecision (coordinate) {
+	limitPrecision(coordinate) {
+		console.log("limitPrecision");
         const rounded = Math.round(coordinate);
         const delta = coordinate - rounded;
         const limitedCoord = (Math.abs(delta) < 1e-9) ? rounded : coordinate;

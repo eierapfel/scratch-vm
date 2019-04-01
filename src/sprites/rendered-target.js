@@ -167,7 +167,8 @@ class RenderedTarget extends Target {
      * Create a drawable with the this.renderer.
      * @param {boolean} layerGroup The layer group this drawable should be added to
      */
-    initDrawable (layerGroup) {
+	initDrawable(layerGroup) {
+		console.log("initDrawable");
         if (this.renderer) {
             this.drawableID = this.renderer.createDrawable(layerGroup);
         }
@@ -179,7 +180,8 @@ class RenderedTarget extends Target {
         }
     }
 
-    get audioPlayer () {
+	get audioPlayer() {
+		console.log("get audioPlayer");
         /* eslint-disable no-console */
         console.warn('get audioPlayer deprecated, please update to use .sprite.soundBank methods');
         console.warn(new Error('stack for debug').stack);
@@ -263,7 +265,8 @@ class RenderedTarget extends Target {
      * @param {!number} y New Y coordinate, in Scratch coordinates.
      * @param {?boolean} force Force setting X/Y, in case of dragging
      */
-    setXY (x, y, force) {
+	setXY(x, y, force) {
+		console.log("setXY");
         if (this.isStage) return;
         if (this.dragging && !force) return;
         const oldX = this.x;
@@ -292,7 +295,8 @@ class RenderedTarget extends Target {
      * Get the rendered direction and scale, after applying rotation style.
      * @return {object<string, number>} Direction and scale to render.
      */
-    _getRenderedDirectionAndScale () {
+	_getRenderedDirectionAndScale() {
+		console.log("_getRenderedDirectionAndScale");
         // Default: no changes to `this.direction` or `this.scale`.
         let finalDirection = this.direction;
         let finalScale = [this.size, this.size];
@@ -312,7 +316,9 @@ class RenderedTarget extends Target {
      * Set the direction.
      * @param {!number} direction New direction.
      */
-    setDirection (direction) {
+	setDirection(direction) {
+		console.log("setDirection");
+		console.log(direction);
         if (this.isStage) {
             return;
         }
@@ -339,7 +345,8 @@ class RenderedTarget extends Target {
      * Set draggability; i.e., whether it's able to be dragged in the player
      * @param {!boolean} draggable True if should be draggable.
      */
-    setDraggable (draggable) {
+	setDraggable(draggable) {
+		console.log("setDraggable");
         if (this.isStage) return;
         this.draggable = !!draggable;
         this.runtime.requestTargetsUpdate(this);
@@ -350,7 +357,8 @@ class RenderedTarget extends Target {
      * @param {?string} type Type of say bubble: "say", "think", or null.
      * @param {?string} message Message to put in say bubble.
      */
-    setSay (type, message) {
+	setSay(type, message) {
+		console.log("setSay");
         if (this.isStage) {
             return;
         }
@@ -366,7 +374,8 @@ class RenderedTarget extends Target {
      * Set visibility; i.e., whether it's shown or hidden.
      * @param {!boolean} visible True if should be shown.
      */
-    setVisible (visible) {
+	setVisible(visible) {
+		console.log("setVisible");
         if (this.isStage) {
             return;
         }
@@ -387,7 +396,8 @@ class RenderedTarget extends Target {
      * Set size, as a percentage of the costume size.
      * @param {!number} size Size of rendered target, as % of costume size.
      */
-    setSize (size) {
+	setSize(size) {
+		console.log("setSize");
         if (this.isStage) {
             return;
         }
@@ -421,7 +431,8 @@ class RenderedTarget extends Target {
      * @param {!string} effectName Name of effect (see `RenderedTarget.prototype.effects`).
      * @param {!number} value Numerical magnitude of effect.
      */
-    setEffect (effectName, value) {
+	setEffect(effectName, value) {
+		console.log("setEffect");
         if (!this.effects.hasOwnProperty(effectName)) return;
         this.effects[effectName] = value;
         if (this.renderer) {
@@ -438,7 +449,8 @@ class RenderedTarget extends Target {
     /**
      * Clear all graphic effects on this rendered target.
      */
-    clearEffects () {
+	clearEffects() {
+		console.log("clearEffects");
         for (const effectName in this.effects) {
             if (!this.effects.hasOwnProperty(effectName)) continue;
             this.effects[effectName] = 0;
@@ -456,7 +468,8 @@ class RenderedTarget extends Target {
      * Set the current costume.
      * @param {number} index New index of costume.
      */
-    setCostume (index) {
+	setCostume(index) {
+		console.log("setCostume");
         // Keep the costume index within possible values.
         index = Math.round(index);
         if ([Infinity, -Infinity, NaN].includes(index)) index = 0;
@@ -494,7 +507,8 @@ class RenderedTarget extends Target {
      * @param {!object} costumeObject Object representing the costume.
      * @param {?int} index Index at which to add costume
      */
-    addCostume (costumeObject, index) {
+	addCostume(costumeObject, index) {
+		console.log("addCostume");
         if (typeof index === 'number' && !isNaN(index)) {
             this.sprite.addCostumeAt(costumeObject, index);
         } else {
@@ -508,6 +522,7 @@ class RenderedTarget extends Target {
      * @param {string} newName - the desired new name of the costume (will be modified if already in use).
      */
     renameCostume (costumeIndex, newName) {
+		console.log("renameCostume");
         const usedNames = this.sprite.costumes
             .filter((costume, index) => costumeIndex !== index)
             .map(costume => costume.name);
@@ -536,7 +551,8 @@ class RenderedTarget extends Target {
      * if the index was out of bounds of the costumes list or
      * this target only has one costume.
      */
-    deleteCostume (index) {
+	deleteCostume(index) {
+		console.log("deleteCostume");
         const originalCostumeCount = this.sprite.costumes.length;
         if (originalCostumeCount === 1) return null;
 
@@ -563,7 +579,8 @@ class RenderedTarget extends Target {
      * @param {!object} soundObject Object representing the sound.
      * @param {?int} index Index at which to add costume
      */
-    addSound (soundObject, index) {
+	addSound(soundObject, index) {
+		console.log("addSound");
         const usedNames = this.sprite.sounds.map(sound => sound.name);
         soundObject.name = StringUtil.unusedName(soundObject.name, usedNames);
         if (typeof index === 'number' && !isNaN(index)) {
@@ -578,7 +595,8 @@ class RenderedTarget extends Target {
      * @param {int} soundIndex - the index of the sound to be renamed.
      * @param {string} newName - the desired new name of the sound (will be modified if already in use).
      */
-    renameSound (soundIndex, newName) {
+	renameSound(soundIndex, newName) {
+		console.log("renameSound");
         const usedNames = this.sprite.sounds
             .filter((sound, index) => soundIndex !== index)
             .map(sound => sound.name);
@@ -593,7 +611,8 @@ class RenderedTarget extends Target {
      * @param {number} index Sound index to be deleted
      * @return {object} The deleted sound object, or null if no sound was deleted.
      */
-    deleteSound (index) {
+	deleteSound(index) {
+		console.log("deleteSound");
         // Make sure the sound index is not out of bounds
         if (index < 0 || index >= this.sprite.sounds.length) {
             return null;
@@ -608,7 +627,8 @@ class RenderedTarget extends Target {
      * Update the rotation style.
      * @param {!string} rotationStyle New rotation style.
      */
-    setRotationStyle (rotationStyle) {
+	setRotationStyle(rotationStyle) {
+		console.log("setRotationStyle");
         if (rotationStyle === RenderedTarget.ROTATION_STYLE_NONE) {
             this.rotationStyle = RenderedTarget.ROTATION_STYLE_NONE;
         } else if (rotationStyle === RenderedTarget.ROTATION_STYLE_ALL_AROUND) {
@@ -635,7 +655,8 @@ class RenderedTarget extends Target {
      * @param {?string} costumeName Name of a costume.
      * @return {number} Index of the named costume, or -1 if not present.
      */
-    getCostumeIndexByName (costumeName) {
+	getCostumeIndexByName(costumeName) {
+		console.log("getCostumeIndexByName");
         for (let i = 0; i < this.sprite.costumes.length; i++) {
             if (this.getCostumes()[i].name === costumeName) {
                 return i;
@@ -648,7 +669,8 @@ class RenderedTarget extends Target {
      * Get a costume of this rendered target by id.
      * @return {object} current costume
      */
-    getCurrentCostume () {
+	getCurrentCostume() {
+		console.log("getCurrentCostume");
         return this.getCostumes()[this.currentCostume];
     }
 
@@ -656,7 +678,8 @@ class RenderedTarget extends Target {
      * Get full costume list
      * @return {object[]} list of costumes
      */
-    getCostumes () {
+	getCostumes() {
+		console.log("getCostumes");
         return this.sprite.costumes;
     }
 
@@ -666,7 +689,8 @@ class RenderedTarget extends Target {
      * @param {!number} newIndex New index for that costume.
      * @returns {boolean} If a change occurred (i.e. if the indices do not match)
      */
-    reorderCostume (costumeIndex, newIndex) {
+	reorderCostume(costumeIndex, newIndex) {
+		console.log("reorderCostume");
         newIndex = MathUtil.clamp(newIndex, 0, this.sprite.costumes.length - 1);
         costumeIndex = MathUtil.clamp(costumeIndex, 0, this.sprite.costumes.length - 1);
 
@@ -713,7 +737,8 @@ class RenderedTarget extends Target {
      * Update all drawable properties for this rendered target.
      * Use when a batch has changed, e.g., when the drawable is first created.
      */
-    updateAllDrawableProperties () {
+	updateAllDrawableProperties() {
+		console.log("updateAllDrawableProperties");
         if (this.renderer) {
             const renderedDirectionScale = this._getRenderedDirectionAndScale();
             const costume = this.getCostumes()[this.currentCostume];
@@ -1001,7 +1026,8 @@ class RenderedTarget extends Target {
      * If we've hit the global clone limit, returns null.
      * @return {RenderedTarget} New clone.
      */
-    makeClone () {
+	makeClone() {
+		console.log("makeClone");
         if (!this.runtime.clonesAvailable() || this.isStage) {
             return null; // Hit max clone limit, or this is the stage.
         }
@@ -1028,7 +1054,8 @@ class RenderedTarget extends Target {
      * Make a duplicate using a duplicate sprite.
      * @return {RenderedTarget} New clone.
      */
-    duplicate () {
+	duplicate() {
+		console.log("duplicate");
         return this.sprite.duplicate().then(newSprite => {
             const newTarget = newSprite.createClone();
             // Copy all properties.
@@ -1068,7 +1095,8 @@ class RenderedTarget extends Target {
      * Post/edit sprite info.
      * @param {object} data An object with sprite info data to set.
      */
-    postSpriteInfo (data) {
+	postSpriteInfo(data) {
+		console.log("postSpriteInfo");
         const force = data.hasOwnProperty('force') ? data.force : null;
         const isXChanged = data.hasOwnProperty('x');
         const isYChanged = data.hasOwnProperty('y');
@@ -1111,7 +1139,8 @@ class RenderedTarget extends Target {
      * Serialize sprite info, used when emitting events about the sprite
      * @returns {object} Sprite data as a simple object
      */
-    toJSON () {
+	toJSON() {
+		console.log("toJSON");
         const costumes = this.getCostumes();
         return {
             id: this.id,

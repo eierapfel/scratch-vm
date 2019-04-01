@@ -577,6 +577,7 @@ const serialize = function (runtime, targetId) {
  * @return {object} The deserialized input descriptor.
  */
 const deserializeInputDesc = function (inputDescOrId, parentId, isShadow, blocks) {
+	console.log("deseriallizeInputDesc");
     if (!Array.isArray(inputDescOrId)) return inputDescOrId;
     const primitiveObj = Object.create(null);
     const newId = uid();
@@ -620,7 +621,7 @@ const deserializeInputDesc = function (inputDescOrId, parentId, isShadow, blocks
         primitiveObj.topLevel = false;
         break;
     }
-    case INTEGER_NUM_PRIMITIVE: {
+      case INTEGER_NUM_PRIMITIVE: {
         primitiveObj.opcode = 'math_integer';
         primitiveObj.fields = {
             NUM: {
@@ -632,6 +633,7 @@ const deserializeInputDesc = function (inputDescOrId, parentId, isShadow, blocks
         break;
     }
     case ANGLE_NUM_PRIMITIVE: {
+        console.log('math_angle');
         primitiveObj.opcode = 'math_angle';
         primitiveObj.fields = {
             NUM: {
@@ -846,7 +848,7 @@ const parseScratchObject = function (object, runtime, extensions, zip) {
         sprite.name = object.name;
     }
     if (object.hasOwnProperty('blocks')) {
-        deserializeBlocks(object.blocks);
+      deserializeBlocks(object.blocks);
         // Take a second pass to create objects and add extensions
         for (const blockId in object.blocks) {
             if (!object.blocks.hasOwnProperty(blockId)) continue;

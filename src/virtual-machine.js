@@ -841,6 +841,7 @@ class VirtualMachine extends EventEmitter {
      *     2 for double-resolution bitmaps
      */
     updateBitmap (costumeIndex, bitmap, rotationCenterX, rotationCenterY, bitmapResolution) {
+		console.log("updateBitmap");
         const costume = this.editingTarget.getCostumes()[costumeIndex];
         if (!(costume && this.runtime && this.runtime.renderer)) return;
 
@@ -894,6 +895,7 @@ class VirtualMachine extends EventEmitter {
      * @param {number} rotationCenterY y of point about which the costume rotates, relative to its upper left corner
      */
     updateSvg (costumeIndex, svg, rotationCenterX, rotationCenterY) {
+		console.log("updateSVG");
         const costume = this.editingTarget.getCostumes()[costumeIndex];
         if (costume && this.runtime && this.runtime.renderer) {
             costume.rotationCenterX = rotationCenterX;
@@ -1452,7 +1454,8 @@ class VirtualMachine extends EventEmitter {
      * Post/edit sprite info for the current editing target or the drag target.
      * @param {object} data An object with sprite info data to set.
      */
-    postSpriteInfo (data) {
+	postSpriteInfo(data) {
+		console.log("postSpriteInfo");
         if (this._dragTarget) {
             this._dragTarget.postSpriteInfo(data);
         } else {
